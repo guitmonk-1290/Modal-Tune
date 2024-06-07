@@ -3,12 +3,12 @@ from datetime import datetime
 import os
 from math import ceil
 
-from .common import (
+from common import (
     MODEL_PATH,
     VOL_MOUNT_PATH,
     WANDB_PROJECT,
-    output_vol,
-    stub,
+    # output_vol,
+    # stub,
     get_data_path,
     get_model_path,
     generate_prompt_sql,
@@ -61,7 +61,7 @@ def _train(
         LoraConfig,
         get_peft_model,
         get_peft_model_state_dict,
-        prepare_model_for_int8_training,
+        prepare_model_for_kbit_training,
         set_peft_model_state_dict,
     )
     from transformers import LlamaForCausalLM, LlamaTokenizer
@@ -87,7 +87,7 @@ def _train(
 
     model = LlamaForCausalLM.from_pretrained(
         base_model,
-        load_in_8bit=True,
+        load_in_4bit=True,
         torch_dtype=torch.float16,
         device_map=device_map,
     )
@@ -130,7 +130,7 @@ def _train(
             raise NotImplementedError("not implemented yet")
         return tokenized_full_prompt
 
-    model = prepare_model_for_int8_training(model)
+    model = prepare_model_for_kbit_training(model)
 
     config = LoraConfig(
         r=lora_r,
@@ -219,15 +219,15 @@ def _train(
     print("\n If there's a warning about missing keys above, please disregard :)")
 
 
-@stub.function(
-    gpu="A100",
-    # TODO: Modal should support optional secrets.
-    secret=Secret.from_name("my-wandb-secret") if WANDB_PROJECT else None,
-    timeout=60 * 60 * 2,
-    network_file_systems={VOL_MOUNT_PATH: output_vol},
-    cloud="oci",
-    allow_cross_region_volumes=True,
-)
+# @stub.function(
+#     gpu="A100",
+#     # TODO: Modal should support optional secrets.
+#     secret=Secret.from_name("my-wandb-secret") if WANDB_PROJECT else None,
+#     timeout=60 * 60 * 2,
+#     network_file_systems={VOL_MOUNT_PATH: output_vol},
+#     cloud="oci",
+#     allow_cross_region_volumes=True,
+# )
 def finetune(data_dir: str = "data_sql", model_dir: str = "data_sql"):
     from datasets import load_dataset
 
@@ -249,3 +249,5 @@ def finetune(data_dir: str = "data_sql", model_dir: str = "data_sql"):
 
     # # Delete scraped data after fine-tuning
     # os.remove(data_path)
+
+finetune()

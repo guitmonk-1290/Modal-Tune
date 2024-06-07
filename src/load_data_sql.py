@@ -1,23 +1,20 @@
 import json
 
 from modal import Retries
-from .common import (
-    stub,
-    VOL_MOUNT_PATH,
-    output_vol,
+from common import (
     get_data_path
 )
 
-@stub.function(
-    retries=Retries(
-        max_retries=3,
-        initial_delay=5.0,
-        backoff_coefficient=2.0,
-    ),
-    timeout=60 * 60 * 2,
-    network_file_systems={VOL_MOUNT_PATH.as_posix(): output_vol},
-    cloud="gcp",
-)
+# @stub.function(
+#     retries=Retries(
+#         max_retries=3,
+#         initial_delay=5.0,
+#         backoff_coefficient=2.0,
+#     ),
+#     timeout=60 * 60 * 2,
+#     network_file_systems={VOL_MOUNT_PATH.as_posix(): output_vol},
+#     cloud="gcp",
+# )
 def load_data_sql(data_dir: str = "data_sql"):
     from datasets import load_dataset
 
@@ -37,4 +34,5 @@ def load_data_sql(data_dir: str = "data_sql"):
                     "output": item["answer"],
                 }
                 f.write(json.dumps(newitem) + "\n")
-    
+
+load_data_sql()

@@ -7,8 +7,8 @@ VOL_MOUNT_PATH = Path("/vol")
 
 WANDB_PROJECT = "test-finetune-modal"
 
-MODEL_PATH = "/model"
-
+# MODEL_PATH = "/home/guitmonk/model"
+MODEL_PATH = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 def download_models():
     from transformers import LlamaForCausalLM, LlamaTokenizer
@@ -50,12 +50,13 @@ openllama_image = (
     .pip_install("wandb==0.15.0")
 )
 
-stub = Stub(name="sql-finetune-bot", image=openllama_image)
-stub.model_dict = Dict.from_name("model_dict", create_if_missing=True)
-stub.data_dict = Dict.from_name("data_dict", create_if_missing=True)
+# stub = Stub(name="sql-finetune-bot", image=openllama_image)
+# stub.model_dict = Dict.new()
+# stub.data_dict = Dict.new()
+
 
 # output_vol = NetworkFileSystem.new(cloud="gcp").persisted("doppelbot-vol")
-output_vol = NetworkFileSystem.from_name("doppelbot-vol", create_if_missing=True)
+# output_vol = NetworkFileSystem.from_name("doppelbot-vol", create_if_missing=True)
 
 
 def generate_prompt_sql(input, context, output=""):
